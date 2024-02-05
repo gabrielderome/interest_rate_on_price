@@ -39,6 +39,13 @@ data_dict = {
         "nom": "taux_hypothecaire_terme_5ans",
         "delimiter": ";"
     },
+    "interest_rates_bank_of_can": {
+        "path": r"data_and_cleaning\data\stats_can\interest_rates_bank_of_can.csv",
+        "gran:": "monthly",
+        "date_range": ["200501", "202312"],
+        "nom": "interest_rates_bank_of_can",
+        "delimiter": ";"
+    },
 }
 
 def save_table(df, name):
@@ -54,4 +61,12 @@ def load_table(path, delimiter=','):
 
 for table in data_dict:
     name = data_dict[table]["nom"]
-    data_dict[name]["df"] = load_table(data_dict[table]["path"], delimiter=";")
+    data_dict[name]["df"] = load_table(data_dict[table]["path"], delimiter = ";")
+    df = data_dict[table]["df"]
+    print(f"Table: {name}")
+    #for each columns in the dataframe print each columns and if they are a string print all possible values
+    for col in df.columns:
+        print(f"Column: {col}")
+        if df[col].dtype == np.dtype('O'):
+            print(f"Unique values: {df[col].unique()}")
+            
