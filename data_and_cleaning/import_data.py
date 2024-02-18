@@ -115,11 +115,25 @@ for table in data_dict:
     # save the df in the output dict
     output_dict[table] = df
     
+def get_date_range(df):
+    if "month_year" in df.columns:
+        min = df["month_year"].min()
+        max = df["month_year"].max()
+        return f"Date range: {min} to {max}"
+    
 # for table in output_dict, print the first 5 rows for all columns and print a summary of each column and its datatype
+# for table in output_dict:
+#     print(table)
+#     print(output_dict[table].head(5))
+#     print(output_dict[table].info())
+
+
+
+
+# for all tables in output_dict, get the date range
 for table in output_dict:
     print(table)
-    print(output_dict[table].head(5))
-    print(output_dict[table].info())
+    print(get_date_range(output_dict[table]))
 
 
      
