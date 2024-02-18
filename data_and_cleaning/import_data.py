@@ -3,40 +3,42 @@ import numpy as np
 import os
 
 
+import os
+
 data_dict = {
     "pib_par_industrie": {
-        "path": r"data_and_cleaning\data\stats_can\pib_par_industrie.csv",
+        "path": os.path.join("data_and_cleaning", "data", "stats_can", "pib_par_industrie.csv"),
         "gran:": "industrie and monthly",
         "date_range": ["200501", "202312"],
         "nom": "pib_par_industrie",
         "delimiter": ";",
         "select": {
-            "Prix": "price",
-            "PÉRIODE DE RÉFÉRENCE": "month_year",
+            "PÉRIODE DE RÉFÉRENCE": "CalendarMonth",
             "Système de classification des industries de l'Amérique du Nord (SCIAN)": "industry",
+            "VALEUR": "PIB_par_industrie",
         }
     },
     "investissement_construction": {
-        "path": r"data_and_cleaning\data\stats_can\investissement_construction.csv",
+        "path": os.path.join("data_and_cleaning", "data", "stats_can", "investissement_construction.csv"),
         "gran:": "monthly",
         "date_range": ["201701", "202312"],
         "nom": "investissement_construction",
         "delimiter": ";",
         "select": {
-            "PÉRIODE DE RÉFÉRENCE": "month_year",
+            "PÉRIODE DE RÉFÉRENCE": "CalendarMonth",
             "Type de structure": "structure_type",
             "Type de travaux": "work_type",
             "VALEUR": "inverstissement_construction"
         }
     },
     "construction_par_region": {
-        "path": r"data_and_cleaning\data\stats_can\construction_par_region.csv",
+        "path": os.path.join("data_and_cleaning", "data", "stats_can", "construction_par_region.csv"),
         "gran:": "yearly, par region",
         "date_range": ["200501", "202312"],
         "nom": "construction_par_region",
         "delimiter": ";",
         "select": {
-            "PÉRIODE DE RÉFÉRENCE": "year",
+            "PÉRIODE DE RÉFÉRENCE": "CalendarYear",
             "Estimations de logement": "construction_status",
             "Type d'unité": "construction_unit_type",
             "VALEUR": "PIB_par_secteur_construction",
@@ -44,36 +46,36 @@ data_dict = {
         }
     },
     "indice_de_prix_logements": {
-        "path": r"data_and_cleaning\data\stats_can\indice_de_prix_logements.csv",
+        "path": os.path.join("data_and_cleaning", "data", "stats_can", "indice_de_prix_logements.csv"),
         "gran:": "monthly",
         "date_range": ["200501", "202312"],
         "nom": "indice_de_prix_logements",
         "delimiter": ";",
         "select": {
-            "PÉRIODE DE RÉFÉRENCE": "month_year",
+            "PÉRIODE DE RÉFÉRENCE": "CalendarMonth",
             "Indices des prix des logements neufs": "new_housing_price_index",
             "VALEUR": "indice_de_prix_logements",
         }
     },
     "taux_hypothecaire_terme_5ans": {
-        "path": r"data_and_cleaning\data\stats_can\taux_hypothecaire_terme_5ans.csv",
+        "path": os.path.join("data_and_cleaning", "data", "stats_can", "taux_hypothecaire_terme_5ans.csv"),
         "gran:": "monthly",
         "date_range": ["200501", "202312"],
         "nom": "taux_hypothecaire_terme_5ans",
         "delimiter": ";",
         "select": {
-            "PÉRIODE DE RÉFÉRENCE": "month_year",
+            "PÉRIODE DE RÉFÉRENCE": "CalendarMonth",
             "VALEUR": "taux_hypothecaire_terme_5ans",
         }
     },
     "interest_rates_bank_of_can": {
-        "path": r"data_and_cleaning\data\stats_can\interest_rates_bank_of_can.csv",
+        "path": os.path.join("data_and_cleaning", "data", "stats_can", "interest_rates_bank_of_can.csv"),
         "gran:": "monthly",
         "date_range": ["200501", "202312"],
         "nom": "interest_rates_bank_of_can",
         "delimiter": ",",
         "select": {
-            "REF_DATE": "month_year",
+            "REF_DATE": "CalendarMonth",
             "Rates": "rate_type",
             "VALUE": "interst_rate_value",
         }
@@ -81,63 +83,64 @@ data_dict = {
 }
 
 def save_table(df, name):
-    if name in os.listdir("data_and_cleaning/cleaned_data"):
-        os.remove(f"data_and_cleaning/cleaned_data/{name}.csv")
-    df.to_csv(f"data_and_cleaning/cleaned_data/{name}.csv", index=False)
-    return f"{name} saved at data_and_cleaning/cleaned_data/{name}.csv"
+    file_path = os.path.join("data_and_cleaning", "cleaned_data", f"{name}.csv")
+    if name in os.listdir(os.path.dirname(file_path)):
+        os.remove(file_path)
+    df.to_csv(file_path, index=False)
+    return f"{name} saved at {file_path}"
 
-def load_table(path, delimiter=',', print = False):
-    df = pd.read_csv(f"{path}", delimiter=delimiter)
-    if print == True:
+def load_table(path, delimiter=',', print=False):
+    df = pd.read_csv(path, delimiter=delimiter)
+    if print:
         print(df.head(100))
     return df
 
 def select_rename_columns(df, select):
     df = df.rename(columns=select)
-    df = df[select.values()]
+    df = df[list(select.values())]
     return df
 
 def extract_year(df):
-    #if month_year column exists, extract year and month (the format that is already in the column: "yyyy-mm")
     if "month_year" in df.columns:
         df["year"] = df["month_year"].str.extract(r"(\d{4})")
         df["month"] = df["month_year"].str.extract(r"-(\d{2})")
     return df
 
-
 output_dict = {}
 
-for table in data_dict:
-    df = load_table(data_dict[table]["path"], data_dict[table]["delimiter"])
-    df = select_rename_columns(df, data_dict[table]["select"])
-    #if month_year column exists, print the df[month_year]
+for table, table_info in data_dict.items():
+    df = load_table(table_info["path"], table_info["delimiter"])
+    df = select_rename_columns(df, table_info["select"])
     df = extract_year(df)
-    # save the df in the output dict
     output_dict[table] = df
-    
+
 def get_date_range(df):
-    if "month_year" in df.columns:
-        min = df["month_year"].min()
-        max = df["month_year"].max()
-        return f"Date range: {min} to {max}"
-    
-# for table in output_dict, print the first 5 rows for all columns and print a summary of each column and its datatype
-# for table in output_dict:
-#     print(table)
-#     print(output_dict[table].head(5))
-#     print(output_dict[table].info())
+    if "CalendarMonth" in df.columns:
+        min_date = df["CalendarMonth"].min()
+        max_date = df["CalendarMonth"].max()
+        return f"Date range: {min_date} to {max_date}"
+    elif "CalendarYear" in df.columns:
+        min_date = df["CalendarYear"].min()
+        max_date = df["CalendarYear"].max()
+        return f"Date range: {min_date} to {max_date}"
 
-
-
-
-# for all tables in output_dict, get the date range
-for table in output_dict:
+for table, df in output_dict.items():
     print(table)
-    print(get_date_range(output_dict[table]))
+    print(get_date_range(df))
 
+joined_df = output_dict["pib_par_industrie"].merge(
+    output_dict["investissement_construction"], on=["CalendarMonth"], how="left"
+).merge(
+    output_dict["indice_de_prix_logements"], on=["CalendarMonth"], how="left"
+).merge(
+    output_dict["taux_hypothecaire_terme_5ans"], on=["CalendarMonth"], how="left"
+).merge(
+    output_dict["interest_rates_bank_of_can"], on=["CalendarMonth"], how="left"
+)
 
-     
+# display the joined dataframe (fully: all columns and rows)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+print(joined_df.head(100))
 
-
-
-            
+save_table(joined_df, "joined_data")
