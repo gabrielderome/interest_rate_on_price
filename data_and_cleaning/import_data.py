@@ -126,9 +126,20 @@ def get_date_range(df):
     #print the number of records (size of the dataframe
     return f"Number of records: {df.shape[0]}"
 
-for table, df in output_dict.items():
-    print(table)
-    print(get_date_range(df))
+def get_nulls(df):
+    return df.isnull().mean()
+
+def get_nans(df):
+    return df.isna().mean()
+
+
+# for table, df in output_dict.items():
+#     print(table)
+#     print(get_date_range(df))
+#     print(get_nulls(df))
+#     print(get_nans(df))
+
+ 
 
 joined_df = output_dict["pib_par_industrie"].merge(
     output_dict["investissement_construction"], on=["CalendarMonth"], how="left"
@@ -140,9 +151,11 @@ joined_df = output_dict["pib_par_industrie"].merge(
     output_dict["interest_rates_bank_of_can"], on=["CalendarMonth"], how="left"
 )
 
-# display the joined dataframe (fully: all columns and rows)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
-print(joined_df.head(100))
+print(get_date_range(joined_df))
+print(get_nulls(joined_df))
+print(get_nans(joined_df))
+
+print(joined_df.shape[0])
+print(joined_df.columns)
 
 save_table(joined_df, "joined_data")
