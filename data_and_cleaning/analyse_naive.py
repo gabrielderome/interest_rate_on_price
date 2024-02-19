@@ -35,6 +35,38 @@ def plot_interest_rate():
     # add a legend with white text
     plt.legend(facecolor='black', edgecolor='white', labelcolor='white')
     # display the plot
-    return plt.savefig('interest_rates.png', dpi=300, bbox_inches='tight')  
+    return plt.savefig('interest_rates.png', dpi=300, bbox_inches='tight') 
 
-plot_interest_rate()
+
+def plot_price_index_and_rate():
+    df_taux_hypothecaire_terme_5ans = df[['CalendarMonth', 'taux_hypothecaire_terme_5ans']]
+    df_taux_hypothecaire_terme_5ans = df_taux_hypothecaire_terme_5ans.dropna().drop_duplicates()
+    df_price_index = df[['CalendarMonth', "indice_de_prix_logements"]]
+    df_price_index = df_price_index.dropna().groupby('CalendarMonth').mean().reset_index()
+    fig, ax1 = plt.subplots()
+    fig.patch.set_facecolor('black')
+    ax2 = ax1.twinx()
+    ax1.plot(df_taux_hypothecaire_terme_5ans['CalendarMonth'], df_taux_hypothecaire_terme_5ans['taux_hypothecaire_terme_5ans'], label='taux hypothecaire terme 5 ans', color='cyan')
+    ax2.plot(df_price_index['CalendarMonth'], df_price_index['indice_de_prix_logements'], label='indice de prix logements', color='yellow')
+    ax1.set_ylim(0, 10)
+    ax2.set_ylim(50, 150)
+    ax1.tick_params(axis='y', colors='cyan')
+    ax2.tick_params(axis='y', colors='yellow')
+    ax1.tick_params(axis='x', colors='white')
+    ax2.tick_params(axis='x', colors='white')
+    ax2.set_yticklabels(ax2.get_yticks(), color='yellow')
+    plt.legend(facecolor='black', edgecolor='white', labelcolor='white')
+    ax1.set_facecolor('black')
+    ax2.set_facecolor('black')
+    ticks = ax1.get_xticks()
+    ax1.set_xticks(ticks[::48])
+    ax1.set_xticklabels(df_taux_hypothecaire_terme_5ans['CalendarMonth'][::48], rotation=45, color='white')
+    ax1.set_xlabel('CalendarMonth', color='white')
+    for spine in ax1.spines.values():
+        spine.set_edgecolor('white')
+    for spine in ax2.spines.values():
+        spine.set_edgecolor('white')
+    return plt.savefig('price_index_and_rate.png', dpi=300, bbox_inches='tight')
+
+# plot_price_index_and_rate()
+# plot_interest_rate()
