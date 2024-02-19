@@ -123,6 +123,8 @@ def get_date_range(df):
         min_date = df["CalendarYear"].min()
         max_date = df["CalendarYear"].max()
         return f"Date range: {min_date} to {max_date}"
+    #print the number of records (size of the dataframe
+    return f"Number of records: {df.shape[0]}"
 
 for table, df in output_dict.items():
     print(table)
