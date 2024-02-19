@@ -77,7 +77,7 @@ data_dict = {
         "select": {
             "REF_DATE": "CalendarMonth",
             "Rates": "rate_type",
-            "VALUE": "interst_rate_value",
+            "VALUE": "interest_rate_value",
         }
     },
 }
