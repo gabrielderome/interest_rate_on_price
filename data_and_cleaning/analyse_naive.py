@@ -38,7 +38,7 @@ def plot_interest_rate():
     return plt.savefig('interest_rates.png', dpi=300, bbox_inches='tight') 
 
 
-def plot_price_index_and_rate():
+def plot_new_price_index_and_rate():
     df_taux_hypothecaire_terme_5ans = df[['CalendarMonth', 'taux_hypothecaire_terme_5ans']]
     df_taux_hypothecaire_terme_5ans = df_taux_hypothecaire_terme_5ans.dropna().drop_duplicates()
     df_price_index = df[['CalendarMonth', "indice_de_prix_logements"]]
@@ -66,7 +66,52 @@ def plot_price_index_and_rate():
         spine.set_edgecolor('white')
     for spine in ax2.spines.values():
         spine.set_edgecolor('white')
-    return plt.savefig('price_index_and_rate.png', dpi=300, bbox_inches='tight')
+    return plt.savefig('new_price_index_and_rate.png', dpi=300, bbox_inches='tight')
 
-# plot_price_index_and_rate()
+
+def plot_inv_and_rate():
+    df_taux_hypothecaire_terme_5ans = df[['CalendarMonth', 'taux_hypothecaire_terme_5ans']]
+    df_taux_hypothecaire_terme_5ans = df_taux_hypothecaire_terme_5ans.dropna().drop_duplicates()
+    df_taux_hypothecaire_terme_5ans = df_taux_hypothecaire_terme_5ans[df_taux_hypothecaire_terme_5ans['CalendarMonth'] >= '2017-01']
+    df_inv = df[["CalendarMonth", "inverstissement_construction"]]
+    df_inv = df_inv.dropna().groupby('CalendarMonth').mean().reset_index()
+
+    fig, ax1 = plt.subplots()
+
+    fig.patch.set_facecolor('black')  # set background color to black
+    ax1.set_facecolor('black')  # set the plot area background color to black
+
+    color = 'tab:blue'
+    ax1.set_xlabel('CalendarMonth', color='white')
+    ax1.set_ylabel('taux hypothecaire terme 5 ans', color='white')
+    ax1.plot(df_taux_hypothecaire_terme_5ans['CalendarMonth'], df_taux_hypothecaire_terme_5ans['taux_hypothecaire_terme_5ans'], color=color)
+    ax1.tick_params(axis='y', labelcolor='white')
+    ax1.set_ylim([0,10])  # set y scale for taux_hypothecaire_terme_5ans
+
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+    color = 'tab:red'
+    ax2.set_ylabel('inverstissement construction', color='white')  # we already handled the x-label with ax1
+    ax2.plot(df_inv['CalendarMonth'], df_inv['inverstissement_construction'], color=color)
+    ax2.tick_params(axis='y', labelcolor='white')
+
+    ax1.spines['bottom'].set_color('white')
+    ax1.spines['top'].set_color('white') 
+    ax1.spines['right'].set_color('white')
+    ax1.spines['left'].set_color('white')
+
+    ax2.spines['bottom'].set_color('white')
+    ax2.spines['top'].set_color('white') 
+    ax2.spines['right'].set_color('white')
+    ax2.spines['left'].set_color('white')
+
+    ax1.xaxis.set_major_locator(ticker.MultipleLocator(12))  # set x ticks to appear every 12 months
+    ax1.tick_params(axis='x', colors='white')  # set x tick labels to white
+
+    fig.tight_layout(rect=[0, 0.03, 1, 1])  # adjust the bottom margin
+
+    return plt.savefig('inv_and_rate.png', dpi=300, bbox_inches='tight')
+    
+plot_inv_and_rate()
+# plot_new_price_index_and_rate()
 # plot_interest_rate()
