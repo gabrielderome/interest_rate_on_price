@@ -18,12 +18,12 @@ def extract_year(df):
         df["month"] = df["month_year"].str.extract(r"-(\d{2})")
     return df
 
-def save_table(df, name):
-    file_path = os.path.join("cleaned_data", f"{name}.csv")
-    if name in os.listdir(os.path.dirname(file_path)):
-        os.remove(file_path)
-    df.to_csv(file_path, index=False)
-    return f"{name} saved at {file_path}"
+def save_table(df, path):
+    # if path already exist remove what in it
+    if os.path.exists(path):
+        os.remove(path)
+    df.to_csv(path, index=False)
+    return f"saved at {path}"
 
 def get_date_range(df):
     if "CalendarMonth" in df.columns:
