@@ -21,11 +21,8 @@ def agg_pib(df):
     return df
 
 def agg_investissement(df):
-    # keep only the records where structure_type == "Résidentiel et non résidentiel" AND work_type == "Total"
-    df = df[(df["structure_type"] == "Résidentiel et non résidentiel") & (df["work_type"] == "Total")]
-    df = df.reset_index()
-    # drop index column
-    df = df.drop(columns=["structure_type", "work_type", "index"])
+    df = df[df["structure_type"] == "Résidentiel et non résidentiel, total"]
+    df = df[["CalendarMonth", "inverstissement_construction"]]
     return df
 
 def agg_construction(df):
