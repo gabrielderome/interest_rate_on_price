@@ -8,24 +8,42 @@ import seaborn as sns
 from scipy.stats import spearmanr, pearsonr
 
 
-def plot_spearman_corr(df, save=False):
+def plot_spearman_corr(df, save=False, output_dict=False):
+    corr = df.corr(method='spearman')
     plt.figure(figsize=(10, 10))
-    sns.heatmap(df.corr(method='spearman'), annot=True, fmt=".2f", cmap='coolwarm')
+    sns.heatmap(corr, annot=True, fmt=".2f", cmap='coolwarm')
+    # i would like to populate a dictionnary with the correlation values: on key per feature and the value would be a dictionnary with the other features as keys and the correlation value as value
+    corr_feature = {}
+    for feature in corr.columns:
+        corr_feature[feature] = {}
+        for other_feature in corr.columns:
+            if feature != other_feature:
+                corr_feature[feature][other_feature] = corr.loc[feature, other_feature]
     plt.title("Spearman correlation")
     if save:
         plt.savefig("plots\\spearman_corr.png")
     plt.show()
+    if output_dict == True:
+        return corr_feature
     return
 
-def plot_pearson_corr(df, save=False):
+def plot_pearson_corr(df, save=False, output_dict=False):
     corr = df.corr()
     fig, ax = plt.subplots(figsize=(10, 10))
     sns.heatmap(corr, annot=True, fmt=".2f", cmap='coolwarm', ax=ax)
     plt.title("Pearson Correlation")
     plt.tight_layout()
+    corr_feature = {}
+    for feature in corr.columns:
+        corr_feature[feature] = {}
+        for other_feature in corr.columns:
+            if feature != other_feature:
+                corr_feature[feature][other_feature] = corr.loc[feature, other_feature]
     if save:
         plt.savefig('plots\\pearson_corr.png')
     plt.show()
+    if output_dict == True:
+        return corr_feature
     return
 
 def plot_interest_rate(df, save=False):
